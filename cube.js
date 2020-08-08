@@ -29,8 +29,8 @@ const cube = {
     },
     blocks: [
                 ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
-                ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'],
-                ['@', '&', '(', ')', '£', '+', '?', '#'],
+                ['I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'],
+                ['Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X'],
                 ['WRG', 'WGO', 'WOB', 'WBR', 'YGR', 'YOG', 'YBO', 'YRB']
             ],
     get colourState() {
@@ -142,3 +142,5 @@ const cube = {
 };
 
 cube.turn('RFdUUbLflr');
+console.log(cube.state);
+console.log(cube.solution);
