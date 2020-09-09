@@ -33,26 +33,46 @@ const cube = {
                 ['Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X'],
                 ['GRW', 'GOW', 'BOW', 'BRW', 'GRY', 'GOY', 'BOY', 'BRY'],
             ],
-    //get colourState() {
-    //    let returnString = '';
-    //    for (i = 0; i < 8; i++) {
-    //        cube.activeBlock.name = cube.state.charAt(i);
-    //        cube.activeBlock.update();
-    //        console.log(cube.activeBlock.perm);
-    //        returnString = returnString.concat(cube.blocks[cube.activeBlock.perm + 3][cube.activeBlock.numID] + ' '); 
-            //let orderArray = [];
-            //let z = (1+((cube.activeBlock.perm+cube.activeBlock.ori%2)*Math.sign(cube.activeBlock.perm))%2+Math.sign(cube.activeBlock.perm))*(1-2*(Math.floor(cube.activeBlock.ori/4)));
-            //orderArray.push((4-(2-Math.sign(z)+(z-1)%3))%3);
-            //orderArray.push((3+orderArray[0]+Math.sign(z))%3);
-            //orderArray.push((3+orderArray[1]+Math.sign(z))%3);
-            //order
-            //for (j = 0; j < 3; j ++) {
-            //    returnString = returnString.concat(cube.blocks[3][cube.activeBlock.numID].charAt(orderArray[j]));     
-            //}
-            //returnString = returnString.concat(' ');        
-    //    }
-    //    return returnString;
-    //},
+    stickers: {
+
+    },
+    get colourState() {
+        let stickers = {
+            A: ['white', 'red', 'green'],
+            I: ['red', 'green', 'white'],
+            Q: ['green', 'white', 'red'],
+            B: ['white', 'green', 'orange'],
+            J: ['orange', 'white', 'green'],
+            R: ['green', 'orange', 'white'],
+            C: ['white', 'orange', 'blue'],
+            K: ['orange', 'blue', 'white'],
+            S: ['blue', 'white', 'orange'],
+            D: ['white', 'blue', 'red'],
+            L: ['red', 'white', 'blue'],
+            T: ['blue', 'red', 'white'],
+            E: ['yellow', 'green', 'red'],
+            M: ['green', 'red', 'yellow'],
+            U: ['red', 'yellow', 'green'],
+            F: ['yellow', 'orange', 'green'],
+            N: ['orange', 'green', 'yellow'],
+            V: ['green', 'yellow', 'orange'],
+            G: ['yellow', 'blue', 'orange'],
+            O: ['blue', 'orange', 'yellow'],
+            W: ['orange', 'yellow', 'blue'],
+            H: ['yellow', 'red', 'blue'],
+            P: ['red', 'blue', 'yellow'],
+            X: ['blue', 'yellow', 'red']
+        }
+        let returnObject = {
+            front: [stickers[cube.state[0]][1], stickers[cube.state[3]][2], stickers[cube.state[4]][2], stickers[cube.state[7]][1]],
+            back: [stickers[cube.state[2]][1], stickers[cube.state[1]][2], stickers[cube.state[6]][2], stickers[cube.state[5]][1]],
+            top: [stickers[cube.state[0]][0], stickers[cube.state[3]][0], stickers[cube.state[1]][0], stickers[cube.state[3]][0]],
+            bottom: [stickers[cube.state[5]][0], stickers[cube.state[6]][0], stickers[cube.state[4]][0], stickers[cube.state[7]][0]],
+            left: [stickers[cube.state[1]][1], stickers[cube.state[0]][2], stickers[cube.state[5]][2], stickers[cube.state[4]][1]],
+            right: [stickers[cube.state[3]][1], stickers[cube.state[2]][2], stickers[cube.state[7]][2], stickers[cube.state[6]][1]],
+        }
+        return returnObject;
+    },
     turns: {
         R: {
             plane: 'R',
@@ -124,7 +144,7 @@ const cube = {
             return blockToPermute;
         }
     },
-    turn (sequence, record = true) { ///I need this not to actually change cube.state when doing ghost operations like determining cube.uniqueState
+    turn (sequence, record = true) {
         for (i = 0; i < sequence.length; i ++) {
             if (record === true ) {
                 cube.solution = ((sequence[i] === sequence[i].toUpperCase()) ? sequence[i].toLowerCase() : sequence[i].toUpperCase()).concat(cube.solution);
@@ -180,7 +200,7 @@ const cube = {
         let rotation = cube.opToRotation(o,p);
         return [facing, rotation];
     },
-    get uniqueState() { // this is giving unique states that start with an A?
+    get uniqueState() {
         cube.turn(['Lr', 'fB', 'LrLr', '', '', 'Fb', 'lR'][cube.facingAndRotation[0] + 3], false);
         for (h = 0, n = cube.facingAndRotation[1]; h < n; h ++) {
             cube.turn('uD', false);
@@ -212,8 +232,31 @@ const cube = {
     }
 };
 
-module.exports = cube;
-
-//cube.state = 'AVTXWCRE'
-//console.log(cube.colourState);
-//console.log(cube.uniqueState);
+function getDynamicSolution(state, staticSolution) {
+    cube.state = state;
+    cube.state = state;
+    let dynamicSolution = '';
+    for (y = 0; y < staticSolution.length; y++) {
+        let f = cube.facingAndRotation[0];
+        let r = cube.facingAndRotation[1];
+        let turnArray = ['U', 'u', 'D', 'd', 'L', 'l', 'R', 'r', 'F', 'f', 'B', 'b'];
+        let adaptedTurnArray = [];
+        switch (f) {
+            case -3: adaptedTurnArray = ['B', 'b', 'F', 'f', 'L', 'l', 'R', 'r', 'U', 'u', 'D', 'd']; break;
+            case -2: adaptedTurnArray = ['R', 'r', 'L', 'l', 'U', 'u', 'D', 'd', 'F', 'f', 'B', 'b']; break;
+            case -1: adaptedTurnArray = ['D', 'd', 'U', 'u', 'L', 'l', 'R', 'r', 'B', 'b', 'F', 'f']; break;
+            case  1: adaptedTurnArray = ['U', 'u', 'D', 'd', 'L', 'l', 'R', 'r', 'F', 'f', 'B', 'b']; break;
+            case  2: adaptedTurnArray = ['L', 'l', 'R', 'r', 'D', 'd', 'U', 'u', 'F', 'f', 'B', 'b']; break;
+            case  3: adaptedTurnArray = ['F', 'f', 'B', 'b', 'L', 'l', 'R', 'r', 'D', 'd', 'U', 'u']; break;
+        };
+        let rotationArray = [0, 1, 2, 3, 8, 9, 10, 11, 6, 7, 4, 5];
+        for (j = 0; j < r; j ++) {
+            adaptedTurnArray = adaptedTurnArray.map(turn => {
+                return adaptedTurnArray[rotationArray[adaptedTurnArray.indexOf(turn)]];
+            })
+        };
+        dynamicSolution = dynamicSolution.concat(adaptedTurnArray[turnArray.indexOf(staticSolution[y])]);
+        cube.turn(adaptedTurnArray[turnArray.indexOf(staticSolution[y])]);
+    };
+    return dynamicSolution;   
+};
