@@ -48,12 +48,12 @@
       if (props.inputMode === true) {
         return (
           <div class='palette'>
-            {PaintPot({changeBrush: props.changeBrush, colour: 'white', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: 'yellow', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: 'red', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: 'orange', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: 'blue', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: 'green', brush: props.brush})}
+            {PaintPot({changeBrush: props.changeBrush, colour: '#f3f3f3ff', brush: props.brush})}
+            {PaintPot({changeBrush: props.changeBrush, colour: '#edd60eff', brush: props.brush})}
+            {PaintPot({changeBrush: props.changeBrush, colour: '#ff3133ff', brush: props.brush})}
+            {PaintPot({changeBrush: props.changeBrush, colour: '#ff7c0dff', brush: props.brush})}
+            {PaintPot({changeBrush: props.changeBrush, colour: '#2563f3ff', brush: props.brush})}
+            {PaintPot({changeBrush: props.changeBrush, colour: '#00a23aff', brush: props.brush})}
             <button class = 'palette' onClick={() => props.getCubeState()}>Solve!</button>
           </div>
         )
@@ -221,14 +221,14 @@
       GetCubeState() {
         let l = this.state.layout
         let blocksArray = [
-          ['white', 'red', 'green'],
-          ['white', 'orange', 'green'],
-          ['white', 'orange', 'blue'],
-          ['white', 'blue', 'red'],
-          ['yellow', 'red', 'green'],
-          ['yellow', 'orange', 'green'],
-          ['yellow', 'orange', 'blue'],
-          ['yellow', 'blue', 'red']]
+          ['#f3f3f3ff', '#ff3133ff', '#00a23aff'],
+          ['#f3f3f3ff', '#ff7c0dff', '#00a23aff'],
+          ['#f3f3f3ff', '#ff7c0dff', '#2563f3ff'],
+          ['#f3f3f3ff', '#2563f3ff', '#ff3133ff'],
+          ['#edd60eff', '#ff3133ff', '#00a23aff'],
+          ['#edd60eff', '#ff7c0dff', '#00a23aff'],
+          ['#edd60eff', '#ff7c0dff', '#2563f3ff'],
+          ['#edd60eff', '#2563f3ff', '#ff3133ff']]
         let stateArray = [
           [l.top[0], l.left[1], l.front[0]],
           [l.top[2], l.left[0], l.back[1]],
@@ -244,7 +244,7 @@
           for (let j = 0; j < 8; j ++) {
             if (blocksArray[j].includes(stateArray[i][0]) && blocksArray[j].includes(stateArray[i][1]) && blocksArray[j].includes(stateArray[i][2])) {
               for (let k = 0; k < 3; k++) {
-                if (stateArray[i][k] === 'white' || stateArray[i][k] === 'yellow') {
+                if (stateArray[i][k] === '#f3f3f3ff' || stateArray[i][k] === '#edd60eff') {
                   lookUp = lookUp.concat(cube.blocks[k][j])
                 }
               }
