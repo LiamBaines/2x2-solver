@@ -7,19 +7,25 @@
   <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
   <script src='https://unpkg.com/babel-standalone@6/babel.min.js'></script>
   <script src='scripts/cube.js'></script>
-  <script src='scripts/solutions.js'></script>
+  <script src='scripts/solutions.js' async onload="window.App.SolutionsLoaded()"></script>
 </head>
 <body>
   <div id='app'></div>
-  <script type='text/babel'> // p = props, s = state, f = functions 
+  <script type='text/babel'> // p = props, s = state, f = functions #
+    let loading = true;
     let white = '#f3f3f3ff'
     let yellow = '#edd60eff'
     let red = '#ff3133ff'
     let orange = '#ff7c0dff'
     let blue = '#2563f3ff'
     let green = '#00a23aff'
+    let ready = false;
     function Wrap(p) {
-        return (
+        if (p.s.loading == true) {
+          return (
+            <img src = 'media/loading.gif' className='center'/>
+          )
+        } else return (
             <div className='wrap'>
               {Cube({s: p.s, f: p.f})}
               {Palette({s: p.s, f: p.f})}
@@ -36,12 +42,12 @@
           {Face({s: p.s, f: p.f, className: 'left',  colours: p.s.layout.left})}
           {Face({s: p.s, f: p.f, className: 'right',  colours: p.s.layout.right})}
           <div>
-            {Arrow({s: p.s, f: p.f, className: 'topRight', direction: 'Rl'})}
-            {Arrow({s: p.s, f: p.f, className: 'topLeft', direction: 'fB'})}
-            {Arrow({s: p.s, f: p.f, className: 'centreRight', direction: 'uD'})}
-            {Arrow({s: p.s, f: p.f, className: 'centreLeft', direction: 'Ud'})}
-            {Arrow({s: p.s, f: p.f, className: 'bottomLeft', direction: 'rL'})}
-            {Arrow({s: p.s, f: p.f, className: 'bottomRight', direction: 'Fb'})}
+            {Arrow({s: p.s, f: p.f, className: 'topRight', direction: ['R', 'l']})}
+            {Arrow({s: p.s, f: p.f, className: 'topLeft', direction: ['f', 'B']})}
+            {Arrow({s: p.s, f: p.f, className: 'centreRight', direction: ['u', 'D']})}
+            {Arrow({s: p.s, f: p.f, className: 'centreLeft', direction: ['U', 'd']})}
+            {Arrow({s: p.s, f: p.f, className: 'bottomLeft', direction: ['r', 'L']})}
+            {Arrow({s: p.s, f: p.f, className: 'bottomRight', direction: ['F', 'b']})}
           </div>
         </div>
       )
@@ -106,7 +112,6 @@
       }
     }
     function Palette(p) {
-      if (p.s.inputMode === true) {
         return (
           <div className = 'palette'>
             <table className = 'palette tight'>
@@ -121,16 +126,9 @@
                 </tr>
               </tbody>
             </table>
-            <button className = 'palette tight' onClick={() => p.f.getCubeState()}>Solve!</button>
+            {Buttons({s: p.s, f: p.f})}
           </div>
         )
-      } else {
-        return (
-          <div className='palette'>
-            <button className = 'palette' onClick={() => p.f.next(p.f.turn, p.s.dynamicSolution[p.s.step])}>Next</button>
-          </div>
-        )
-      }
     }
     function PaintPot(p) {
       let style = {
@@ -144,15 +142,33 @@
         <td className ='paintPot' style={style} onClick={() => p.f.changeBrush(p.colour)}></td>
       )
     }
+    function Buttons(p) {
+      if (p.s.inputMode == true) {
+        return <div>
+          <button className = 'palette tight' onClick={() => p.f.solve()}>Solve</button>
+          <button className = 'palette tight' onClick={() => p.f.reset()}>Reset</button>
+          <button className = 'palette tight' onClick={() => p.f.scramble()}>Scramble</button>
+        </div>
+      } else if (p.s.dynamicSolution[p.s.step] == 'X') {
+        return <button className = 'palette tight' onClick={() => p.f.reset()}>Reset</button>
+      } else {
+        return <button className = 'palette' onClick={() => p.f.next(p.f.turn, p.s.dynamicSolution[p.s.step])}>Next</button>
+      }
+    }
     class App extends React.Component {
       constructor(p) {
         super(p);
+        window.App = this;
         this.ChangeBrush = this.ChangeBrush.bind(this);
         this.Paint = this.Paint.bind(this);
         this.Turn = this.Turn.bind(this);
-        this.GetCubeState = this.GetCubeState.bind(this);
+        this.Solve = this.Solve.bind(this);
         this.Next = this.Next.bind(this);
+        this.SolutionsLoaded.bind(this);
+        this.Reset = this.Reset.bind(this);
+        this.Scramble = this.Scramble.bind(this);
         this.state = {
+            loading: true,
             inputMode: true,
             layout: {
               front: ['grey', 'grey', 'grey', 'grey'],
@@ -162,10 +178,7 @@
               left: ['grey', 'grey', 'grey', 'grey'],
               right: ['grey', 'grey', 'grey', 'grey']
             },
-            brush: 'grey',
-            style: {
-              animation: ''
-            },
+            brush: white,
             cubeState: 'N/A',
             cubeUniqueState: 'N/A',
             dynamicSolution: '',
@@ -189,9 +202,11 @@
         })
         }
       }
-      Turn(turn) {
-          this.setState((currentState) => {
-          let l = this.state.layout
+      Turn(array) {
+        let n = array.length
+        let l = this.state.layout
+        for (let i = 0; i < n; i++) {
+          let turn = array[i]
           let stickerArray = l.front.concat(l.back, l.top, l.bottom, l.left, l.right);
           let maps = {
             R: [0, 15, 2, 13, 9, 5, 11, 7, 8, 3, 10, 1, 12, 4, 14, 6, 16, 17, 18, 19, 22, 20, 23, 21],
@@ -215,8 +230,7 @@
           }
           let mapArray = maps[turn];
           let r = mapArray.map(x => stickerArray[x]);
-          return {
-            layout: {
+          l = {
               front: [r[0], r[1], r[2], r[3]],
               back: [r[4], r[5], r[6], r[7]],
               top: [r[8], r[9], r[10], r[11]],
@@ -225,10 +239,15 @@
               right: [r[20], r[21], r[22], r[23]]
             }
           }
-        })
-      }
-      GetCubeState() {
+          this.setState((currentState) => {
+            return {
+              layout: l
+            }
+          })
+        }
+      Solve() {
         let l = this.state.layout
+        console.log(this.state.cubeState)
         let blocksArray = [
           [white, red, green],
           [white, orange, green],
@@ -284,25 +303,64 @@
               step: currentState.step + 1,
             }
           })
-        turn(direction);
+        turn([direction]);
         }
       }
-      render() {
-        let style = {
-          animation: this.state.animation
+      SolutionsLoaded() {
+        this.setState((currentState) => {
+          return {
+            loading: false
+          }
+        })
+      }
+      Reset() {
+        this.setState((currentState) => {
+          return {
+            inputMode: true,
+            layout: {
+              front: ['grey', 'grey', 'grey', 'grey'],
+              back: ['grey', 'grey', 'grey', 'grey'],
+              top: ['grey', 'grey', 'grey', 'grey'],
+              bottom: ['grey', 'grey', 'grey', 'grey'],
+              left: ['grey', 'grey', 'grey', 'grey'],
+              right: ['grey', 'grey', 'grey', 'grey']
+            },
+            cubeState: 'N/A',
+            cubeUniqueState: 'N/A',
+            dynamicSolution: '',
+            step: 0,
+          }
+        })
+      }
+      Scramble() {
+        this.state.layout = {
+          front: [red, red, red, red],
+          back: [orange, orange, orange, orange],
+          top: [white, white, white, white],
+          bottom: [yellow, yellow, yellow, yellow],
+          left: [green, green, green, green],
+          right: [blue, blue, blue, blue]
+        };
+        let turns = ['U', 'u', 'D', 'd', 'L', 'l', 'R', 'r', 'F', 'f', 'B', 'b'];
+        let t = []
+        for (let i = 0; i < 50; i ++) {
+          t.push(turns[Math.floor(Math.random()*12)])
         }
+        window.App.Turn(t)
+      }
+      render() {
         return (
-          <div id='container'>
             <Wrap
               s = {this.state}
               f = {{
                 changeBrush: this.ChangeBrush,
                 paint: this.Paint,
                 turn: this.Turn,
-                getCubeState: this.GetCubeState,
-                next: this.Next
+                solve: this.Solve,
+                next: this.Next,
+                reset: this.Reset,
+                scramble: this.Scramble
               }}/>
-        </div>
       )
       }
     }
