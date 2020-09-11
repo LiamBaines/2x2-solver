@@ -2,7 +2,7 @@
 	perspective: 800px;
 	perspective-origin: 50% 100px;
 	width: 50%;
-	margin: 125px auto;
+	margin: 125px auto 0 auto;
 }
 
 .cube {
