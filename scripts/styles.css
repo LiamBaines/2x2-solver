@@ -92,13 +92,18 @@
 	width: 50%;
 	height: 50%;
 	border-style: solid;
-	border-spacing: 0;
+}
+
+.tight {
+
+	padding: 0;
 }
 
 .palette {
     width: 315px;
     position: relative;
-    margin: auto;
+	margin: auto;
+	border-spacing: 0;
 }
 
 .paintPot {

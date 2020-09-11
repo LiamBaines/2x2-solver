@@ -2,91 +2,88 @@
 <html>
 <head>
   <title>2x2 Rubik's Cube Solver</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="scripts/styles.css">
   <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
   <script src='https://unpkg.com/babel-standalone@6/babel.min.js'></script>
-  <script src='cube.js'></script>
-  <script src='solutions.js' async></script>
+  <script src='scripts/cube.js'></script>
+  <script src='scripts/solutions.js' async></script>
 </head>
 <body>
   <div id='app'></div>
-  <script type='text/babel'>
-    function Wrap(props) {
+  <script type='text/babel'> // p = props, s = state, f = functions 
+    let white = '#f3f3f3ff'
+    let yellow = '#edd60eff'
+    let red = '#ff3133ff'
+    let orange = '#ff7c0dff'
+    let blue = '#2563f3ff'
+    let green = '#00a23aff'
+    function Wrap(p) {
         return (
-            <div  class='wrap'>
-              {Cube({style: props.style, layout: props.layout, paint: props.paint, spin: props.spin, turn: props.turn, inputMode: props.inputMode, dynamicSolution: props.dynamicSolution, step: props.step})}
-              {Palette({changeBrush: props.changeBrush, brush: props.brush, inputMode: props.inputMode, getCubeState: props.getCubeState, next: props.next, turn: props.turn, direction: props.dynamicSolution[props.step]})}
+            <div className='wrap'>
+              {Cube({s: p.s, f: p.f})}
+              {Palette({s: p.s, f: p.f})}
             </div>
         )
     }
-    function Arrow(props) {
-      if (props.inputMode == true) {
-        return (
-            <img
-              class = {props.class + ' arrow'}
-              id = 'hover'
-              src='media/arrow.png'
-              onClick={() => props.turn(props.direction)}
-            />
-        )
-      }
-    }
-    function PaintPot(props) {
-      props.style = {
-        backgroundColor: props.colour,
-        opacity: 0.5
-      };
-      if (props.brush === props.colour) {
-        props.style.opacity = 1
-      };
+    function Cube(p) {
       return (
-        <td class ='paintPot' style={props.style} onClick={() => props.changeBrush(props.colour)}></td>
-      )
-    }
-    function Palette(props) {
-      if (props.inputMode === true) {
-        return (
-          <div class='palette'>
-            {PaintPot({changeBrush: props.changeBrush, colour: '#f3f3f3ff', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: '#edd60eff', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: '#ff3133ff', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: '#ff7c0dff', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: '#2563f3ff', brush: props.brush})}
-            {PaintPot({changeBrush: props.changeBrush, colour: '#00a23aff', brush: props.brush})}
-            <button class = 'palette' onClick={() => props.getCubeState()}>Solve!</button>
-          </div>
-        )
-      } else {
-        return (
-          <div class='palette'>
-            <button class = 'palette' onClick={() => props.next(props.turn, props.direction)}>Next</button>
-          </div>
-        )
-      }
-    }
-    function Cube(props) {
-      return (
-        <div class='cube' style={props.style}>
-          {Face({class: 'front',  colours: props.layout.front, paint: props.paint, dynamicSolution: props.dynamicSolution, inputMode: props.inputMode, step: props.step})}
-          {Face({class: 'back',  colours: props.layout.back, paint: props.paint, dynamicSolution: props.dynamicSolution, inputMode: props.inputMode, step: props.step})}
-          {Face({class: 'top',  colours: props.layout.top, paint: props.paint, dynamicSolution: props.dynamicSolution, inputMode: props.inputMode, step: props.step})}
-          {Face({class: 'bottom',  colours: props.layout.bottom, paint: props.paint, dynamicSolution: props.dynamicSolution, inputMode: props.inputMode, step: props.step})}
-          {Face({class: 'left',  colours: props.layout.left, paint: props.paint, dynamicSolution: props.dynamicSolution, inputMode: props.inputMode, step: props.step})}
-          {Face({class: 'right',  colours: props.layout.right, paint: props.paint, dynamicSolution: props.dynamicSolution, inputMode: props.inputMode, step: props.step})}
+        <div className='cube' style={p.style}>
+          {Face({s: p.s, f: p.f, className: 'front',  colours: p.s.layout.front})}
+          {Face({s: p.s, f: p.f, className: 'back',  colours: p.s.layout.back})}
+          {Face({s: p.s, f: p.f, className: 'top',  colours: p.s.layout.top})}
+          {Face({s: p.s, f: p.f, className: 'bottom',  colours: p.s.layout.bottom})}
+          {Face({s: p.s, f: p.f, className: 'left',  colours: p.s.layout.left})}
+          {Face({s: p.s, f: p.f, className: 'right',  colours: p.s.layout.right})}
           <div>
-            {Arrow({class: 'topRight', turn: props.turn, direction: 'Rl', inputMode: props.inputMode, inputMode: props.inputMode})}
-            {Arrow({class: 'topLeft', turn: props.turn, direction: 'fB', inputMode: props.inputMode, inputMode: props.inputMode})}
-            {Arrow({class: 'centreRight', turn: props.turn, direction: 'uD', inputMode: props.inputMode, inputMode: props.inputMode})}
-            {Arrow({class: 'centreLeft', turn: props.turn, direction: 'Ud', inputMode: props.inputMode, inputMode: props.inputMode})}
-            {Arrow({class: 'bottomLeft', turn: props.turn, direction: 'rL', inputMode: props.inputMode, inputMode: props.inputMode})}
-            {Arrow({class: 'bottomRight', turn: props.turn, direction: 'Fb', inputMode: props.inputMode, inputMode: props.inputMode})}
+            {Arrow({s: p.s, f: p.f, className: 'topRight', direction: 'Rl'})}
+            {Arrow({s: p.s, f: p.f, className: 'topLeft', direction: 'fB'})}
+            {Arrow({s: p.s, f: p.f, className: 'centreRight', direction: 'uD'})}
+            {Arrow({s: p.s, f: p.f, className: 'centreLeft', direction: 'Ud'})}
+            {Arrow({s: p.s, f: p.f, className: 'bottomLeft', direction: 'rL'})}
+            {Arrow({s: p.s, f: p.f, className: 'bottomRight', direction: 'Fb'})}
           </div>
         </div>
       )
     }
-    function Guide(props) {
-      let move = props.dynamicSolution[props.step]
+    function Face(p) {
+        return (
+              <div className={p.className}>
+                  <table>
+                      <tbody>
+                        {Guide({s: p.s, className: p.className})}
+                              <tr>
+                                  {Sticker({colour: p.colours[0], f: p.f, face: p.className, num: 0})}
+                                  {Sticker({colour: p.colours[1], f: p.f, face: p.className, num: 1})}
+                              </tr>
+                              <tr>
+                                  {Sticker({colour: p.colours[2], f: p.f, face: p.className, num: 2})}
+                                  {Sticker({colour: p.colours[3], f: p.f, face: p.className, num: 3})}
+                              </tr>
+                      </tbody>
+                  </table>
+              </div>
+        )
+    }
+    function Sticker(p) {
+        return (
+            <td style={{backgroundColor: p.colour}} onClick={() => p.f.paint(p.face, p.num)}>
+            </td>
+        )
+    }
+    function Arrow(p) {
+      if (p.s.inputMode == true) {
+        return (
+            <img
+              className = {p.className + ' arrow'}
+              src='media/arrow.png'
+              onClick={() => p.f.turn(p.direction)}
+            />
+        )
+      }
+    }
+    function Guide(p) {
+      let move = p.s.dynamicSolution[p.s.step]
       const styles = {
         F: { top: [90, 0], right: [180, 180] },
         f: { top: [270, 180], right: [0, 0] },
@@ -102,41 +99,54 @@
         d: { front: [270, 0], right: [270, 0]},
         X: {}     
       }
-      if (props.inputMode == false) {
-        if (Object.keys(styles[move]).includes(props.class)) {
-          console.log('rendering')
-          return <img src='media/guide_square.png' class='guide' style={{transform: 'rotate(' + styles[move][props.class][0] + 'deg) rotateY(' + styles[move][props.class][1] + 'deg)'}}/>
+      if (p.s.inputMode == false) {
+        if (Object.keys(styles[move]).includes(p.className)) {
+          return <img src='media/guide_square.png' className='guide' style={{transform: 'rotate(' + styles[move][p.className][0] + 'deg) rotateY(' + styles[move][p.className][1] + 'deg)'}}/>
         }
       }
     }
-    function Sticker(props) {
+    function Palette(p) {
+      if (p.s.inputMode === true) {
         return (
-            <td style={{backgroundColor: props.colour}} onClick={() => props.paint(props.face, props.num)}>
-            </td>
+          <div className = 'palette'>
+            <table className = 'palette tight'>
+              <tbody>
+                <tr>
+                  {PaintPot({s: p.s, f: p.f, colour: white})}
+                  {PaintPot({s: p.s, f: p.f, colour: yellow})}
+                  {PaintPot({s: p.s, f: p.f, colour: red})}
+                  {PaintPot({s: p.s, f: p.f, colour: orange})}
+                  {PaintPot({s: p.s, f: p.f, colour: blue})}
+                  {PaintPot({s: p.s, f: p.f, colour: green})}
+                </tr>
+              </tbody>
+            </table>
+            <button className = 'palette tight' onClick={() => p.f.getCubeState()}>Solve!</button>
+          </div>
         )
+      } else {
+        return (
+          <div className='palette'>
+            <button className = 'palette' onClick={() => p.f.next(p.f.turn, p.s.dynamicSolution[p.s.step])}>Next</button>
+          </div>
+        )
+      }
     }
-    function Face(props) {
-        return (
-              <div class={props.class}>
-                  <table>
-                      <tbody>
-                        {Guide({class: props.class, dynamicSolution: props.dynamicSolution, step: props.step, inputMode: props.inputMode})}
-                              <tr>
-                                  {Sticker({colour: props.colours[0], paint: props.paint, face: props.class, num: 0})}
-                                  {Sticker({colour: props.colours[1], paint: props.paint, face: props.class, num: 1})}
-                              </tr>
-                              <tr>
-                                  {Sticker({colour: props.colours[2], paint: props.paint, face: props.class, num: 2})}
-                                  {Sticker({colour: props.colours[3], paint: props.paint, face: props.class, num: 3})}
-                              </tr>
-                      </tbody>
-                  </table>
-              </div>
-        )
+    function PaintPot(p) {
+      let style = {
+        backgroundColor: p.colour,
+        opacity: 0.5
+      };
+      if (p.s.brush === p.colour) {
+        style.opacity = 1
+      };
+      return (
+        <td className ='paintPot' style={style} onClick={() => p.f.changeBrush(p.colour)}></td>
+      )
     }
     class App extends React.Component {
-      constructor(props) {
-        super(props);
+      constructor(p) {
+        super(p);
         this.ChangeBrush = this.ChangeBrush.bind(this);
         this.Paint = this.Paint.bind(this);
         this.Turn = this.Turn.bind(this);
@@ -180,7 +190,6 @@
         }
       }
       Turn(turn) {
-        console.log('turning in direction ' + turn)
           this.setState((currentState) => {
           let l = this.state.layout
           let stickerArray = l.front.concat(l.back, l.top, l.bottom, l.left, l.right);
@@ -221,14 +230,14 @@
       GetCubeState() {
         let l = this.state.layout
         let blocksArray = [
-          ['#f3f3f3ff', '#ff3133ff', '#00a23aff'],
-          ['#f3f3f3ff', '#ff7c0dff', '#00a23aff'],
-          ['#f3f3f3ff', '#ff7c0dff', '#2563f3ff'],
-          ['#f3f3f3ff', '#2563f3ff', '#ff3133ff'],
-          ['#edd60eff', '#ff3133ff', '#00a23aff'],
-          ['#edd60eff', '#ff7c0dff', '#00a23aff'],
-          ['#edd60eff', '#ff7c0dff', '#2563f3ff'],
-          ['#edd60eff', '#2563f3ff', '#ff3133ff']]
+          [white, red, green],
+          [white, orange, green],
+          [white, orange, blue],
+          [white, blue, red],
+          [yellow, red, green],
+          [yellow, orange, green],
+          [yellow, orange, blue],
+          [yellow, blue, red]]
         let stateArray = [
           [l.top[0], l.left[1], l.front[0]],
           [l.top[2], l.left[0], l.back[1]],
@@ -244,7 +253,7 @@
           for (let j = 0; j < 8; j ++) {
             if (blocksArray[j].includes(stateArray[i][0]) && blocksArray[j].includes(stateArray[i][1]) && blocksArray[j].includes(stateArray[i][2])) {
               for (let k = 0; k < 3; k++) {
-                if (stateArray[i][k] === '#f3f3f3ff' || stateArray[i][k] === '#edd60eff') {
+                if (stateArray[i][k] === white || stateArray[i][k] === yellow) {
                   lookUp = lookUp.concat(cube.blocks[k][j])
                 }
               }
@@ -254,16 +263,13 @@
         cube.state = lookUp;
         let unique = cube.uniqueState;
         let staticSolution = ''
-        console.log('About to start searching.')
         for (let i = 0; i < 3674160; i ++) {
           if (solutions[i][0] === unique) {
             staticSolution = solutions[i][1];
             break;
           }
         }
-        console.log('Finished searching.')
         let dynamic = getDynamicSolution(lookUp, staticSolution)
-        console.log(dynamic)
         this.setState((currentState) => {
           return {
             dynamicSolution: dynamic + 'X',
@@ -288,20 +294,14 @@
         return (
           <div id='container'>
             <Wrap
-              style={this.state.style}
-              layout={this.state.layout}
-              changeBrush={this.ChangeBrush}
-              paint={this.Paint}
-              brush={this.state.brush}
-              spin = {this.Spin}
-              turn = {this.Turn}
-              cubeState = {this.state.cubeState}
-              cubeUniqueState = {this.state.cubeUniqueState}
-              getCubeState = {this.GetCubeState}
-              dynamicSolution = {this.state.dynamicSolution}
-              inputMode = {this.state.inputMode}
-              step = {this.state.step}
-              next = {this.Next}/>
+              s = {this.state}
+              f = {{
+                changeBrush: this.ChangeBrush,
+                paint: this.Paint,
+                turn: this.Turn,
+                getCubeState: this.GetCubeState,
+                next: this.Next
+              }}/>
         </div>
       )
       }
