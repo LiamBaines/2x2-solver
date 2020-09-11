@@ -26,7 +26,7 @@
             <img
               class = {props.class + ' arrow'}
               id = 'hover'
-              src='./arrow.png'
+              src='media/arrow.png'
               onClick={() => props.turn(props.direction)}
             />
         )
@@ -105,7 +105,7 @@
       if (props.inputMode == false) {
         if (Object.keys(styles[move]).includes(props.class)) {
           console.log('rendering')
-          return <img src='guide_square.png' class='guide' style={{transform: 'rotate(' + styles[move][props.class][0] + 'deg) rotateY(' + styles[move][props.class][1] + 'deg)'}}/>
+          return <img src='media/guide_square.png' class='guide' style={{transform: 'rotate(' + styles[move][props.class][0] + 'deg) rotateY(' + styles[move][props.class][1] + 'deg)'}}/>
         }
       }
     }
