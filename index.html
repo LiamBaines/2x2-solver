@@ -26,10 +26,13 @@
             <img src = 'media/loading.gif' className='center'/>
           )
         } else return (
+          <div>
             <div className='wrap'>
               {Cube({s: p.s, f: p.f})}
               {Palette({s: p.s, f: p.f})}
             </div>
+            <div className = 'footer'>See the 2x2 solver in action <a href='https://youtu.be/QTSZLOQi8YQ' target="_blank">here</a>!</div>
+          </div>
         )
     }
     function Cube(p) {
