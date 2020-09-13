@@ -115,23 +115,45 @@
       }
     }
     function Palette(p) {
-        return (
-          <div className = 'palette'>
-            <table className = 'palette tight'>
-              <tbody>
-                <tr>
-                  {PaintPot({s: p.s, f: p.f, colour: white})}
-                  {PaintPot({s: p.s, f: p.f, colour: yellow})}
-                  {PaintPot({s: p.s, f: p.f, colour: red})}
-                  {PaintPot({s: p.s, f: p.f, colour: orange})}
-                  {PaintPot({s: p.s, f: p.f, colour: blue})}
-                  {PaintPot({s: p.s, f: p.f, colour: green})}
-                </tr>
-              </tbody>
-            </table>
-            {Buttons({s: p.s, f: p.f})}
-          </div>
-        )
+      let nonGreyCount = 0;
+      let disabled = [false, true, true, false]
+      let returnElements = []
+      returnElements[0] = <table className = 'palette tight'>
+        <tbody>
+          <tr>
+            {PaintPot({s: p.s, f: p.f, colour: white})}
+            {PaintPot({s: p.s, f: p.f, colour: yellow})}
+            {PaintPot({s: p.s, f: p.f, colour: red})}
+            {PaintPot({s: p.s, f: p.f, colour: orange})}
+            {PaintPot({s: p.s, f: p.f, colour: blue})}
+            {PaintPot({s: p.s, f: p.f, colour: green})}
+          </tr>
+        </tbody>
+      </table>;
+      Object.keys(p.s.layout).forEach((face) => {
+        if (!p.s.layout[face].includes('grey')) {
+          nonGreyCount++
+        }
+      })
+      if (nonGreyCount == 6) {
+        disabled[1] = false
+      };
+      if (p.s.inputMode == false) {
+        disabled[0] = true;
+        disabled[1] = true;
+        (p.s.dynamicSolution[p.s.step] == 'X') ? disabled[2] = true : disabled [2] = false;
+      };
+      returnElements.push(
+        <button className = 'palette tight' onClick={() => p.f.scramble()} disabled={disabled[0]}>Scramble</button>,
+        <button className = 'palette tight' onClick={() => p.f.solve()} disabled={disabled[1]}>Solve</button>,
+        <button className = 'palette tight' onClick={() => p.f.next(p.f.turn, p.s.dynamicSolution[p.s.step])} disabled={disabled[2]}>Next</button>,
+        <button className = 'palette tight' onClick={() => p.f.reset()} disabled={disabled[3]}>Reset</button>,
+      )
+      return ( 
+        <div className = 'palette'>
+          {returnElements}
+        </div>
+      )
     }
     function PaintPot(p) {
       let style = {
@@ -144,19 +166,6 @@
       return (
         <td className ='paintPot' style={style} onClick={() => p.f.changeBrush(p.colour)}></td>
       )
-    }
-    function Buttons(p) {
-      if (p.s.inputMode == true) {
-        return <div>
-          <button className = 'palette tight' onClick={() => p.f.solve()}>Solve</button>
-          <button className = 'palette tight' onClick={() => p.f.reset()}>Reset</button>
-          <button className = 'palette tight' onClick={() => p.f.scramble()}>Scramble</button>
-        </div>
-      } else if (p.s.dynamicSolution[p.s.step] == 'X') {
-        return <button className = 'palette tight' onClick={() => p.f.reset()}>Reset</button>
-      } else {
-        return <button className = 'palette' onClick={() => p.f.next(p.f.turn, p.s.dynamicSolution[p.s.step])}>Next</button>
-      }
     }
     class App extends React.Component {
       constructor(p) {
@@ -296,6 +305,7 @@
           return {
             dynamicSolution: dynamic + 'X',
             inputMode: false,
+            brush: ''
           }
         })
       }
@@ -332,6 +342,7 @@
             cubeUniqueState: 'N/A',
             dynamicSolution: '',
             step: 0,
+            brush: white
           }
         })
       }
