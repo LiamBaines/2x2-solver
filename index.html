@@ -7,12 +7,10 @@
   <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
   <script src='https://unpkg.com/babel-standalone@6/babel.min.js'></script>
   <script src='scripts/cube.js'></script>
-  <script src='scripts/solutions.js' async onload="window.App.SolutionsLoaded()"></script>
 </head>
 <body>
   <div id='app'></div>
   <script type='text/babel'> // p = props, s = state, f = functions #
-    let loading = true;
     let white = '#f3f3f3ff'
     let yellow = '#edd60eff'
     let red = '#ff3133ff'
@@ -21,11 +19,7 @@
     let green = '#00a23aff'
     let ready = false;
     function Wrap(p) {
-        if (p.s.loading == true) {
-          return (
-            <img src = 'media/loading.gif' className='center'/>
-          )
-        } else return (
+        return (
           <div>
             <div className='wrap'>
               {Cube({s: p.s, f: p.f})}
@@ -176,11 +170,9 @@
         this.Turn = this.Turn.bind(this);
         this.Solve = this.Solve.bind(this);
         this.Next = this.Next.bind(this);
-        this.SolutionsLoaded.bind(this);
         this.Reset = this.Reset.bind(this);
         this.Scramble = this.Scramble.bind(this);
         this.state = {
-            loading: true,
             inputMode: true,
             layout: {
               front: ['grey', 'grey', 'grey', 'grey'],
@@ -259,7 +251,6 @@
         }
       Solve() {
         let l = this.state.layout
-        console.log(this.state.cubeState)
         let blocksArray = [
           [white, red, green],
           [white, orange, green],
@@ -295,8 +286,8 @@
         let unique = cube.uniqueState;
         let staticSolution = ''
         for (let i = 0; i < 3674160; i ++) {
-          if (solutions[i][0] === unique) {
-            staticSolution = solutions[i][1];
+          if (this.state.solutions[2*i] === unique) {
+            staticSolution = this.state.solutions[2*i + 1];
             break;
           }
         }
@@ -319,17 +310,11 @@
         turn([direction]);
         }
       }
-      SolutionsLoaded() {
-        this.setState((currentState) => {
-          return {
-            loading: false
-          }
-        })
-      }
       Reset() {
         this.setState((currentState) => {
           return {
             inputMode: true,
+            solutions: [],
             layout: {
               front: ['grey', 'grey', 'grey', 'grey'],
               back: ['grey', 'grey', 'grey', 'grey'],
@@ -362,22 +347,37 @@
         }
         window.App.Turn(t)
       }
+      Fetch() {
+        fetch('./scripts/solutions.csv')
+          .then((response) => {return response.text()})
+          .then((responseText) => {
+            let arr = responseText.split(',');
+            this.setState(() => {
+              return {
+                solutions: arr
+              }
+            })
+          })
+      }
       render() {
         return (
-            <Wrap
-              s = {this.state}
-              f = {{
-                changeBrush: this.ChangeBrush,
-                paint: this.Paint,
-                turn: this.Turn,
-                solve: this.Solve,
-                next: this.Next,
-                reset: this.Reset,
-                scramble: this.Scramble
-              }}/>
-      )
+          <Wrap
+            s = {this.state}
+            f = {{
+              changeBrush: this.ChangeBrush,
+              paint: this.Paint,
+              turn: this.Turn,
+              solve: this.Solve,
+              next: this.Next,
+              reset: this.Reset,
+              scramble: this.Scramble
+            }}/>
+        )
       }
-    }
+      componentDidMount() {
+        this.Fetch();
+      }
+    };
     ReactDOM.render(
       <App />,
       document.getElementById('app')
