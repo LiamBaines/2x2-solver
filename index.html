@@ -251,7 +251,6 @@
         }
       Solve() {
         let l = this.state.layout
-        console.log(this.state.cubeState)
         let blocksArray = [
           [white, red, green],
           [white, orange, green],
@@ -349,19 +348,16 @@
         window.App.Turn(t)
       }
       Fetch() {
-        console.log('Fetching')
         fetch('./scripts/solutions.csv')
           .then((response) => {return response.text()})
           .then((responseText) => {
             let arr = responseText.split(',');
-            console.log(arr)
             this.setState(() => {
               return {
                 solutions: arr
               }
             })
           })
-        .then(console.log('Fetched'))
       }
       render() {
         return (
